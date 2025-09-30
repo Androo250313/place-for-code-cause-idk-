@@ -1,5 +1,4 @@
--- discord.gg/25ms
-
+-- min gaminf cracked
 
 shared.LoaderTitle = "Đăng Ký Kênh Min Gaming";
 shared.LoaderKeyFrames = {
@@ -9327,4 +9326,5 @@ v14:Notify({
     Title = "Min Gaming",
     Content = "Tải Xong",
     Duration = 10
+
 });
