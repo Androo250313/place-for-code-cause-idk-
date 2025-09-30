@@ -1,4 +1,4 @@
--- min gaminf cracked
+-- min gaming cracked
 
 shared.LoaderTitle = "Đăng Ký Kênh Min Gaming";
 shared.LoaderKeyFrames = {
@@ -9328,3 +9328,4 @@ v14:Notify({
     Duration = 10
 
 });
+
