@@ -1,0 +1,155 @@
+local g = getgenv
+local v1000 = game:GetService("Players")
+local v10000 = game:GetService("RunService")
+local v100000 = game:GetService("UserInputService")
+local v1000000 = v1000.LocalPlayer
+local v100000000 = game:GetService("Workspace")
+g().Slient = false
+-----------------
+
+
+local charConnect
+local charDisconnect
+
+
+local function getTarget(root)
+    if not root then 
+        return nil
+    end
+
+    local closestTarget = nil
+    local closestDist = maxDist
+
+    local liveFolder = v100000000:FindFirstChild("Live")
+    if liveFolder then
+        for _, model in pairs(liveFolder:GetChildren()) do
+            if model:IsA("Model") and model.Name == "Weakest Dummy" then
+                local humanoid = model:FindFirstChildOfClass("Humanoid")
+                local rootPart = model:FindFirstChild("HumanoidRootPart")
+                if humanoid and humanoid.Health > 0 and rootPart then
+                    local dist = (rootPart.Position - root.Position).Magnitude
+                    if dist < closestDist then
+                        closestDist = dist
+                        closestTarget = model
+                    end
+                end
+            end
+        end
+    end
+if g().Slient then
+    for _, player in ipairs(v1000:GetPlayers()) do
+        if player ~= v1000000 and player.Character then
+            local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
+            local rootPart = player.Character:FindFirstChild("HumanoidRootPart")
+            if humanoid and humanoid.Health > 0 and rootPart then
+                local dist = (rootPart.Position - root.Position).Magnitude
+                if dist < closestDist then
+                    closestDist = dist
+                    closestTarget = player.Character
+                end
+            end
+        end
+    end
+end
+    return closestTarget
+end
+
+if g().Slient then
+local function setupInput()
+    inputBeganConn = v100000.InputBegan:Connect(function(input, gameProcessed)
+        if gameProcessed then 
+            return 
+        end
+    end)
+end
+    inputEndedConn = v100000.InputEnded:Connect(function(input, gameProcessed)
+        if gameProcessed then 
+            return 
+        end
+    end)
+end
+
+local function setupAimbot()
+    if charConnect then 
+        charDisconnect:Disconnect() 
+    end
+
+    charConnect = v10000.Heartbeat:Connect(function(dt)
+        local char = v1000000.Character
+
+        if not char then 
+            removeHighlight()
+            return
+        end
+
+        local rootPart = char:FindFirstChild("HumanoidRootPart")
+        local humanoid = char:FindFirstChildOfClass("Humanoid")
+
+        if not rootPart or not humanoid then 
+            removeHighlight()
+            return
+        end
+
+        local targetModel = getTarget(rootPart)
+if g().Slient then
+        if targetModel and targetModel.Parent then
+            local targetRoot = targetModel:FindFirstChild("HumanoidRootPart")
+            if targetRoot then
+                local myPos = rootPart.Position
+                local targetPos = Vector3.new(targetRoot.Position.X, myPos.Y, targetRoot.Position.Z)
+                local direction = (targetPos - myPos)
+                end
+
+                if direction.Magnitude > deadzone then
+                    local currentCFrame = rootPart.CFrame - rootPart.CFrame.Position
+                    local targetCFrame = CFrame.new(Vector3.new(0, 0, 0), direction.Unit)
+                    local alpha = math.clamp(1 - math.exp(-dt / smoothness), 0, 1)
+                    local newCFrame = currentCFrame:Lerp(targetCFrame, alpha)
+
+                    humanoid.AutoRotate = false
+                    pcall(function()
+                        rootPart.CFrame = CFrame.new(myPos) * newCFrame
+                    end)
+if g().highlight then
+                    createHighlight(targetModel)
+                    
+                else
+                    humanoid.AutoRotate = true
+                    removeHighlight() end
+                end
+            else
+                humanoid.AutoRotate = true
+                removeHighlight()
+            end
+        else
+            humanoid.AutoRotate = true
+            removeHighlight()
+        end
+    end)
+end
+
+local function setup()
+    setupInput()
+    setupAimbot()
+    v1000000.CharacterAdded:Connect(function()
+        setupAimbot()
+    end)
+    game:BindToClose(function()
+        if charConnect then 
+            charDisconnect:Disconnect() 
+        end
+        if inputBeganConn then 
+            inputBeganConn:Disconnect() 
+        end
+        if inputEndedConn then 
+            inputEndedConn:Disconnect() 
+        end
+        if g().highlight then
+        removeHighlight()
+        end
+    end)
+end 
+local success, err = pcall(setup)
+if not success then
+    warn(err)
+end
